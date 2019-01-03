@@ -1,0 +1,45 @@
+;Recibe por stack el puntero del texto y la cantidad de caracteres ingresados
+;Retorna en AL 0 si no es capicua y 1 si es capicua
+
+Capicua proc
+	push bp
+	mov bp, sp
+	
+	push bx
+	push di
+	push si
+	push dx
+	
+	mov bx, [bp + 4] ;Bajo el puntero del texto a analizar del stack
+	mov si, [bp + 6] ;Bajo la cantidad de caracteres del texto
+	
+	mov DI, 0
+    sub SI, 1 ;Se resta uno para no pasar el último caracter
+    
+Ciclo:
+    cmp SI, 0
+    je CAP
+    mov AL, [DI + BX] ;LA POS MENOR
+    mov DL, [SI + BX] ;LA POS MAYOR
+    SUB SI, 1
+    ADD DI, 1
+    cmp AL, DL
+    jne NO_CAP
+	jmp Ciclo
+
+CAP:
+	mov al, 1
+	jmp FIN
+
+NO_CAP:
+	mov al, 0
+    
+FIN:
+	POP dx
+	POP si
+	pop di
+	pop bx
+	
+	pop bp
+	RET
+ENDP

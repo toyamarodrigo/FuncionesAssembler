@@ -1,0 +1,152 @@
+.8086
+.model small
+.data
+
+.code
+main proc
+	mov ax,@data
+	mov ds,ax
+
+        mov ax,1
+        mov bx,1
+
+        call suma                 ; devuelve en AX, el resultado. AX+BX
+
+        call mostrarbinarioenAx
+
+        mov ax, 4c00h
+        int 21h
+endp
+
+
+suma proc
+; suma recibe en Ax yBx los nros a sumar y retorna en AX la suma
+    add AX, BX    
+    ret
+endp
+
+
+mostrarbinarioenAx proc
+; esto es una función hecha.  
+
+    ret
+endp
+
+;----------------------------------------------------------------------------------
+
+.code
+main proc
+	mov ax,@data
+	mov ds,ax
+
+        mov ax,1
+        mov bx,1
+        push bx
+        push ax
+		mov BX,99
+        call suma
+        add sp,2
+        add sp,2
+?
+
+        call mostrarbinarioenAx
+
+        mov ax, 4c00h
+        int 21h
+endp
+
+
+suma2 proc
+    push bp
+    mov bp,sp
+    push BX
+    mov BX,[bp+6]
+    mov AX,[bp+4]
+    add AX,BX
+    pop BX
+    pop bp    
+    ret
+endp
+
+
+;---------------------------------------------------------------------------
+.8086
+.model small
+.data
+
+.code
+main proc
+	mov ax,@data
+	mov ds,ax
+
+        mov ax,1
+        mov bx,1
+
+        int 80h
+
+        call mostrarbinarioenAx
+
+        mov ax, 4c00h
+        int 21h
+endp
+
+;-----------------------------------------------------------------------------
+;	tasm tsr2.asm
+;	tlink /t tsr2.obj  generar un archivo.com
+;-----------------------------------------------------------------------
+.8086
+.model tiny	; Definicion para generar un archivo .COM
+.code
+   org 100h	; Definicion para generar un archivo .COM
+
+start:
+   jmp main	; Comienza con un salto para dejar la parte residente primero
+
+Funcion PROC FAR
+    push BX
+    add AX,BX
+    pop BX    
+    iret
+endp
+
+; Datos usados dentro de la ISR ya que no hay DS dentro de una ISR
+ViejaInt80      LABEL   DWORD
+DespIntXX    dw   0
+SegIntXX     dw   0
+
+FinResidente LABEL BYTE		; Marca el fin de la porción a dejar residente
+
+
+Cartel    DB "Programa Instalado exitosamente!!!",0dh, 0ah, '$'
+main:
+    mov ax,CS
+    mov DS,ax
+    mov ES,ax
+
+Recupero:
+    mov AX,3580h        ; Obtiene la ISR que esta instalada en la interrupcion
+    int 21h    
+         
+    mov DespIntXX,BX    
+    mov SegIntXX,ES	
+	
+InstalarInt:
+    mov AX,2580h	; Coloca la nueva ISR en el vector de interrupciones
+    mov DX,Offset Funcion 
+    int 21h
+
+MostrarCartel:
+    mov dx, offset Cartel
+    mov ah,9
+    int 21h
+
+DejarResidente:		
+    Mov     AX,(15+offset FinResidente) 
+    Shr     AX,1            
+    Shr     AX,1        ;Se obtiene la cantidad de paragraphs
+    Shr     AX,1
+    Shr     AX,1	;ocupado por el codigo
+    Mov     DX,AX           
+    Mov     AX,3100h    ;y termina sin error 0, dejando el
+    Int     21h         ;programa residente
+end start

@@ -1,0 +1,75 @@
+;REG - EN SI VIENE LA CANTIDAD DE CARACTERES	
+
+CAPICUA PROC 
+
+	PUSH AX
+	PUSH DX
+	
+	sub	SI, 1
+	
+	CAPI:
+		cmp SI, DI
+		je IMPRIMIR_CAP
+		mov AL, [DI + BX] 	;LA POS MENOR
+		mov DL, [SI + BX] 	;LA POS MAYOR
+		SUB SI, 1
+		ADD DI, 1
+		cmp AL, DL
+		jne IMPRIMIR_NO_CAP
+		jmp CAPI
+
+	IMPRIMIR_CAP:
+		mov AH, 9
+		mov DX, offset CAPICUA_T
+		int 21H
+		jmp FIN
+
+	IMPRIMIR_NO_CAP:
+		mov AH, 9
+		mov DX, offset CAPICUA_T2
+		int 21H
+	
+	FIN:
+		POP DX
+		POP AX
+		RET
+	ENDP
+
+
+
+
+
+
+
+
+;BX tiene el puntero del texto a analizar, SI la cantidad de caracteres. Devuelve en AL 1 si es capicua y 0 si no es capicua   
+CAPICUA PROC
+	PUSH DX
+	PUSH DI
+    
+    mov DI, 0
+	sub SI, 1 ;Se resta uno para no pasar el último caracter
+    
+Ciclo:
+	cmp SI, 0
+	je CAP
+	mov AL, [DI + BX] ;LA POS MENOR
+	mov DL, [SI + BX] ;LA POS MAYOR
+	SUB SI, 1
+	ADD DI, 1
+	cmp AL, DL
+	jne NO_CAP
+    jmp Ciclo
+
+CAP:
+    mov al, 1
+    jmp FIN
+
+NO_CAP:
+    mov al, 0
+    
+FIN:
+    POP DI
+    POP DX
+    RET
+ENDP

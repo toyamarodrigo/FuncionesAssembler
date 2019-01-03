@@ -1,0 +1,39 @@
+; Reg Funcion Ingreso Bin 8 bits
+
+IngresoBinario8 PROC
+PUSH DX
+PUSH AX
+    MOV BL, 0                   ;BL = 0000 0000
+    MOV CX, 8                   ;Loop 8
+    CICLO:
+		MOV AH, 8               ;Ingreso de 1 ó 0 en AL
+		INT 21H
+        MOV DL, AL              ;Mueve AL a DL
+
+		CMP DL, "1"             ;Valor en DL = 1?
+		JE UNO
+
+		CMP DL, "0"             ;Valor en DL = 0?
+		JE CERO
+
+		JMP CICLO               ;Jump CICLO
+    UNO:
+        MOV AH, 6               ;Imprime DL
+        INT 21H
+        MOV DL, AL              ;Mueve Valor AL a DL
+
+        SHL BL, 1               ;ShiftLeft BL y agrega 1
+        ADD BL, 1
+        JMP OTRO
+    CERO:
+        MOV AH,6                ;Imprime DL
+        INT 21H
+        MOV DL, AL              ;Mueve valor Al a DL
+
+        SHL BL, 1               ;ShiftLeft BL
+    OTRO:
+        LOOP CICLO              ;Loopea 8 veces (CX = 8)
+POP AX
+POP DX    
+    RET
+ENDP

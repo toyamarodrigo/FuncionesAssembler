@@ -1,0 +1,13 @@
+; REG - FUNCION SUMA DE LOS 2 NUMEROS DECIMALES INGRESADOS E IMPRIME
+PUSH DX
+PUSH AX
+SUMA:
+	ADD BL, BH			; suma
+	ADD BL, '0'			; suma
+	mov DL, BL			; guardo el resultado en DL
+	mov AH, 6
+	int 21H
+POP AX
+POP DX
+RET
+ENDP

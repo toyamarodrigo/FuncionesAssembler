@@ -1,0 +1,40 @@
+; REG - Funcion Ingreso Bin 16bits
+
+IngresoBinario16 PROC
+PUSH AX
+PUSH DX
+    MOV CX, 16                  ;Ciclo de 16
+    MOV BX, 0                   ;BX = 0
+CICLO1:
+    MOV AH, 8                   ;Ingreso de 0 ó 1 en AL
+    INT 21H
+    MOV DL, AL                  ;Muevo valor AL a DL
+
+    CMP DL, '0'
+    JE CERO
+
+    CMP DL, '1'
+    JE UNO
+
+    JMP CICLO1
+UNO:
+    MOV AH, 6                   ;Imprime DL
+    INT 21H
+
+    SHL BX, 1                   ;ShiftLeft BX y agrega 1
+    ADD BX, 1
+
+    JMP SIGO1
+CERO:
+    MOV AH, 6                   ;Imprime DL
+    INT 21H
+    MOV DL, AL                  ;Mueve valor AL a DL
+
+    SHL BX, 1                   ;ShiftLeft BL
+SIGO1:
+    LOOP CICLO1                 ;Loopea 16 veces
+POP DX
+POP AX
+
+RET
+ENDP

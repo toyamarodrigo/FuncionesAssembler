@@ -1,0 +1,55 @@
+; STACK - Funcion Ingreso Bin 8bits
+
+...
+MOV BX, 0
+MOV CX, 8
+PUSH BX
+PUSH CX
+CALL IngresoBinario         ;Llama a IngresoBinario
+ADD SP, 2
+...
+
+    IngresoBinario PROC
+    PUSH BP
+    MOV BP, SP
+
+    MOV CX, [BP+4]    
+    MOV BX, [BX+6]
+
+    PUSH AX
+    PUSH DX
+
+        ING_CICLO:
+            MOV AH, 8               ;Ingreso de 1 ó 0 en AL
+            INT 21H
+            MOV DL, AL              ;Mueve AL a DL
+
+            CMP DL, "1"             ;Valor en DL = 1?
+            JE ING_UNO
+
+            CMP DL, "0"             ;Valor en DL = 0?
+            JE ING_CERO
+
+            JMP ING_CICLO           ;Jump ING_CICLO
+        ING_UNO:
+            MOV AH, 6               ;Imprime DL
+            INT 21H
+            MOV DL, AL              ;Mueve Valor AL a DL
+
+            SHL BL, 1               ;ShiftLeft BL y agrega 1
+            ADD BL, 1
+            JMP OTRO
+        ING_CERO:
+            MOV AH,6                ;Imprime DL
+            INT 21H
+            MOV DL, AL              ;Mueve valor Al a DL
+
+            SHL BL, 1               ;ShiftLeft BL
+        OTRO:
+            LOOP ING_CICLO              ;Loopea 8 veces (CX = 8)
+    POP DX 
+    POP AX
+
+    POP BP   
+        RET
+    ENDP

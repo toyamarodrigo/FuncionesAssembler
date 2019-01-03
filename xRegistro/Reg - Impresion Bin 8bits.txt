@@ -1,0 +1,30 @@
+;Reg Funcion Imprime Bin 8bits
+
+ImprimeBinario PROC
+PUSH AX
+PUSH DX
+    CICLO2:
+        SHL BL, 1                   ;ShiftLeft BL, si hay carry Jmp IMPUNO
+        JC IMPUNO
+    
+    IMPCERO:                        
+        MOV DL, "0"                 ;Mueve 0 a DL
+    
+    SIGO2:
+        MOV AH, 6                   ;Imprime DL
+        INT 21H
+                                    ;CX = 0
+        ADD CX, 1                   ;CX + 1
+
+        CMP CX, 8                   ;CX = 8?
+        JE FIN
+        
+        JMP CICLO2
+    IMPUNO:
+        MOV DL, "1"                 ;Mueve 1 a DL
+        JMP SIGO2
+    FIN:
+POP DX
+POP AX
+        RET
+    ENDP

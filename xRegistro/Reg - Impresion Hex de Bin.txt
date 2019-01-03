@@ -1,0 +1,50 @@
+;Funcion Imprimir Binario a Hex
+;en AL viene el numero binario a imprimir en hexa
+
+IMPRIMIR_HEX PROC
+PUSH AX
+PUSH BX
+PUSH DX  
+
+MOV BL, AL
+MOV DL, AL
+
+CIFRA1:
+    SHR DL, 1
+    SHR DL, 1
+    SHR DL, 1
+    SHR DL, 1
+    CMP DL, 9
+    JLE NUMERO
+LETRA: 
+    ADD DL, 55
+    MOV AH, 6
+    INT 21H
+    JMP SIGO
+NUMERO:
+    ADD DL,48
+    MOV AH,6
+    INT 21H
+SIGO:
+    SHL DL, 1
+    SHL DL, 1
+    SHL DL, 1
+    SHL DL, 1
+    XOR BL, AL
+    CMP BL, 9
+    JLE NUMERO2
+LETRA2:
+    ADD BL ,AL
+    MOV AH ,6
+    INT 21H
+    JMP FIN
+NUMERO2:
+    ADD BL ,AL
+    MOV AH ,6
+    INT 21H
+FIN:
+    POP DX
+    POP BX
+    POP AX
+    RET
+ENDP

@@ -1,0 +1,34 @@
+; Funcion ca1 / ca2	 16bin
+
+COMPLE PROC	
+PUSH AX
+PUSH DX
+
+mov SI, 16
+mov DX, CX
+mov AH, 9
+int 21H
+	XOR BX, 0FFFFH
+	ADD BX, 1
+
+CICLO2:
+	SHL BX, 1
+	JC IMPUNO
+IMPCERO: 
+	mov AH, 6
+	mov DL, '0'
+	int 21h
+	JMP SIGO1
+IMPUNO:
+	mov AH, 6
+	mov DL, '1'
+	int 21h
+SIGO1:
+	DEC SI
+	cmp SI, 0
+	JNE CICLO2
+
+POP DX
+POP AX
+RET
+endp

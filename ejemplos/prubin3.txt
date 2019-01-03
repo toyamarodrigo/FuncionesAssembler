@@ -1,0 +1,117 @@
+;FUNCIONES DE INGRESO POR REGISTRO E IMPRESION DE BINARIO DE 8 BITS POR STACK
+
+.8086
+.MODEL SMALL
+.STACK 100H
+.DATA
+        
+CARTEL DB 0DH, 0AH, "Ingrese Nro Binario 8bits: $"
+CARTEL2 DB 0DH, 0AH, "Impresion de Binario: $"
+
+    .CODE
+    MAIN PROC
+        MOV AX, @DATA
+        MOV DS, AX
+
+        MOV AX, OFFSET CARTEL
+        CALL ImprimirCartel         ;Llama a Imprimir Cartel
+        CALL IngresoBinario         ;Llama a IngresoBinario
+
+        MOV AX, OFFSET CARTEL2  
+        CALL ImprimirCartel         ;Llama a Imprimir Cartel
+        PUSH BX                     ;Guardar valor BX del binario
+        CALL ImprimeBinarioStack    ;Llama a ImprimeBinario
+        ADD SP, 2
+
+        MOV AX, 4C00H               ;Fin
+        INT 21H    
+    ENDP
+
+    ImprimirCartel PROC
+        PUSH AX
+        PUSH DX
+        
+        MOV DX, AX
+        MOV AH, 9
+        INT 21H
+
+        POP DX
+        POP AX
+        RET
+    ENDP
+
+
+    IngresoBinario PROC
+    PUSH DX
+    PUSH AX
+        MOV BL, 0                   ;BL = 0000 0000
+        MOV CX, 8                   ;Loop 8
+        ING_CICLO:
+            MOV AH, 8               ;Ingreso de 1 ó 0 en AL
+            INT 21H
+            MOV DL, AL              ;Mueve AL a DL
+
+            CMP DL, "1"             ;Valor en DL = 1?
+            JE ING_UNO
+
+            CMP DL, "0"             ;Valor en DL = 0?
+            JE ING_CERO
+
+            JMP ING_CICLO           ;Jump ING_CICLO
+        ING_UNO:
+            MOV AH, 6               ;Imprime DL
+            INT 21H
+            MOV DL, AL              ;Mueve Valor AL a DL
+
+            SHL BL, 1               ;ShiftLeft BL y agrega 1
+            ADD BL, 1
+            JMP OTRO
+        ING_CERO:
+            MOV AH,6                ;Imprime DL
+            INT 21H
+            MOV DL, AL              ;Mueve valor Al a DL
+
+            SHL BL, 1               ;ShiftLeft BL
+        OTRO:
+            LOOP ING_CICLO              ;Loopea 8 veces (CX = 8)
+    POP AX
+    POP DX    
+        RET
+    ENDP
+
+    ImprimeBinarioStack PROC
+    PUSH BP                             ;Salvo el BP y guardo el SP en el BP
+    MOV BP, SP
+
+    PUSH AX                             ;Salvo registros a usar
+    PUSH DX
+    PUSH BX
+
+    MOV BX, [BP+4]                      ;Guardo en BX el binario
+    MOV CX, 8                           ;CX = 8 para Loop Binario 8bits
+
+    IMP_CICLO:
+        SHL BL, 1
+        JC IMP_UNO
+        MOV DL, '0'
+        MOV AH, 6
+        INT 21H
+        JMP SIGO
+    IMP_UNO:
+        MOV DL, '1'
+        MOV AH, 6
+        INT 21H
+    SIGO:
+        SUB CX, 1
+        CMP CX, 0
+        JNE IMP_CICLO
+
+        POP BX
+        POP DX
+        POP AX
+        
+        POP BP
+    RET 
+    ENDP
+
+    END MAIN

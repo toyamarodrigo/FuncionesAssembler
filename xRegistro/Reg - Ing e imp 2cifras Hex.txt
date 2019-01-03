@@ -1,0 +1,149 @@
+;REG - Funcion Ing e impresion Hex 2 cifras
+
+.8086
+.MODEL SMALL
+.STACK 100H
+.DATA
+	
+	CARTEL DB 0DH, 0AH, "Ingrese Nro Hex: $"
+    CARTEL2 DB 0DH, 0AH, "Impresion de Hex: $"
+
+.CODE
+MAIN PROC
+	MOV AX, @DATA
+	MOV DS, AX
+
+    MOV AX, OFFSET CARTEL
+    CALL ImprimirCartel         ;Llama a Imprimir Cartel
+    CALL IngresoHex             ;Llama a IngresoHex
+    MOV AX, OFFSET CARTEL2
+    CALL ImprimirCartel
+    CALL IMPRIMIRHEX
+
+
+    MOV AX, 4C00H               ;Fin
+    INT 21H    
+ENDP
+
+ImprimirCartel PROC
+    PUSH AX
+    PUSH DX
+    
+    MOV DX, AX
+    MOV AH, 9
+    INT 21H
+
+    POP DX
+    POP AX
+    RET
+ENDP
+
+IngresoHex PROC
+PUSH AX
+PUSH DX
+	CICLO:                          ;Validar Hexadecimal
+		MOV AH, 8
+		INT 21H
+		CMP AL, '0'
+		JL CICLO
+		CMP AL, 'F'
+		JG CICLO
+		CMP AL, 'A'
+		JGE LETRA
+		CMP AL, '9'
+		JLE NUMERO
+		JMP CICLO
+	NUMERO:
+		MOV AH, 6                   ;Lo mueve a DL e imprime caracter Hex
+		MOV DL, AL
+		INT 21H
+		SUB DL, 48
+		JMP SIGO
+	LETRA:
+		MOV AH, 6
+		MOV DL, AL
+		INT 21H
+		SUB DL, 55
+		JMP SIGO
+	SIGO:
+		MOV BL, DL
+		SHL BL, 1
+		SHL BL, 1
+		SHL BL, 1
+		SHL BL, 1
+	CICLO2:
+		MOV AH, 8
+		INT 21H
+		CMP AL, '0'
+		JL CICLO2
+		CMP AL, 'F'
+		JG CICLO2
+		CMP AL, 'A'
+		JGE LETRA2
+		CMP AL, '9'
+		JLE NUMERO2
+		JMP CICLO2
+	NUMERO2:
+		MOV AH, 6
+		MOV DL, AL
+		INT 21H
+		SUB DL, 48
+		ADD BL, DL
+		JMP SIGO2
+	LETRA2:
+		MOV AH, 6
+		MOV DL, AL
+		INT 21H
+		SUB DL, 55
+		ADD BL, DL
+    SIGO2:
+        MOV CL, BL
+        POP DX
+        POP AX
+RET
+ENDP
+
+IMPRIMIRHEX PROC
+PUSH AX
+PUSH BX
+PUSH DX
+
+CIFRA1:	
+	MOV BL, CL
+	SHR BL, 4
+	CMP BL, 9
+	JLE IMPNUM1
+IMPLETRA1:
+	ADD BL, 55
+	MOV DL, BL
+	MOV AH, 6
+	INT 21H
+	JMP CIFRA2
+IMPNUM1:
+	ADD BL, 48
+	MOV DL, BL
+	MOV AH, 6
+	INT 21H	
+CIFRA2:
+	AND CL, 0FH
+	CMP CL, 9
+	JLE IMPNUM2
+IMPLETRA2:
+	ADD CL, 55
+	MOV DL, CL
+	MOV AH, 6
+	INT 21H
+	JMP FIN
+IMPNUM2:
+	ADD CL, 48
+	MOV DL, CL
+	MOV AH, 6
+	INT 21H
+FIN:	
+    POP DX
+    POP BX
+    POP AX
+RET
+ENDP
+
+END MAIN

@@ -1,0 +1,14 @@
+;REG - BX Puntero a variable de TEXTO
+
+IMP PROC
+PUSH AX
+PUSH DX
+
+	mov AH, 9
+	mov DX, BX
+	INT 21H
+
+POP DX
+POP AX
+RET
+ENDP

@@ -1,0 +1,79 @@
+.8086
+.model small
+.stack 100h
+.data
+	cartel1 db "Ingresar un texto solo en minuscula:", 0dh, 0ah, '$'
+	salto db 0dh, 0ah, '$'
+	texto db 20 dup ('$'), '$'
+.code
+main proc
+	mov ax, @data
+	mov ds, ax
+	
+	mov di, 0
+	mov bx, 0
+	
+	mov ah, 9
+	mov dx, offset cartel1
+	int 21H
+	
+;compruebo que el texto ingresado esté todo en minúscula	
+ciclo1:
+	mov ah, 8 ;lee del teclado pero no lo muestra por pantalla
+	int 21h
+	cmp al, 97
+	jl ciclo1
+	cmp al, 122
+	jg ciclo1
+	
+	mov [di + offset texto], al ;guardo la letra en minúsucla
+	
+	mov dl, al
+	mov ah, 6
+	int 21h ; muestro por pantalla la letra ingresada
+
+	inc di
+	
+	cmp di, 20
+	je ciclo2
+	jmp ciclo1
+
+;compruebo caracter por caracter recorriendo el vector si es una vocal
+ciclo2:
+	cmp bx, di ;recorro todo el vector
+	je imprimir
+	mov al, [bx + offset texto]
+	cmp al, 'a'
+	je mayuscula ;si es una vocal salto a mayuscula para convertirla
+	cmp al, 'e'
+	je mayuscula
+	cmp al, 'i'
+	je mayuscula
+	cmp al, 'o'
+	je mayuscula
+	cmp al, 'u'
+	je mayuscula
+	inc bx
+	jmp ciclo2
+
+;resto 32 para pasar de minúsucla a mayúscula
+mayuscula:
+	sub al, 32
+	mov [bx + offset texto], al ;sustituyo el caracter en minúscula por el de mayúscula
+	inc bx
+	jmp ciclo2
+	
+imprimir:
+	mov ah, 9
+	mov dx, offset salto
+	int 21H
+
+	mov dx, offset texto
+	mov ah, 9
+	int 21h
+	
+fin:
+	mov AX, 4C00H
+	INT 21H
+ENDP
+END MAIN

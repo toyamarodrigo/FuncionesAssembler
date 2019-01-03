@@ -1,0 +1,37 @@
+;REG - FUNCION INGRESO DE TEXTO de hasta 50 Caracteres. 
+;Retorna en SI la cantidad de caracteres ingresados. (espacios tambien)
+
+INGRESO PROC
+PUSH AX
+
+INGRESO:                            ;Verifico caracteres if letras o espacio 
+	MOV AH, 1
+	int 21H
+	CMP AL, 13                      ;Si es Enter -> FIN
+	JE FIN
+	CMP AL, 'A'
+	JL ESPACIO 
+	CMP AL, 'z'
+	JG INGRESO
+	CMP AL, 'Z'
+	JLE GUARDAR
+	CMP AL, 'a'
+	JGE GUARDAR
+	JMP INGRESO
+ESPACIO:
+	CMP AL, 32                      ;Comparo es un espacio
+	JE AMP
+	JMP INGRESO
+GUARDAR:
+	MOV [SI + BX], AL
+	ADD SI, 1
+	CMP SI, 50
+	JE FIN
+	JMP INGRESO
+AMP:
+	MOV AL, 38                      ;Cambio espacio x un &
+	JMP GUARDAR
+FIN:
+POP AX	
+RET	
+ENDP

@@ -1,0 +1,56 @@
+; STACK - Funcion Ingreso Bin 16bits
+
+...
+MOV CX, 16
+MOV BX, 0
+
+PUSH CX
+PUSH BX
+CALL INGRESOBIN16
+ADD SP, 2
+...
+
+
+INGRESOBIN16 PROC
+    PUSH BP                             ;Salvo el BP y guardo el SP en el BP
+    MOV BP, SP
+
+    PUSH AX                             ;Salvo registros a usar
+    PUSH DX
+
+    MOV BX, [BP+4]                      ;Guardo en BX el binario
+    MOV CX, [BP+6]                      ;CX = LOOP
+ING_CICLO:
+    MOV AH, 8                   ;Ingreso de 0 ó 1 en AL
+    INT 21H
+    MOV DL, AL                  ;Muevo valor AL a DL
+
+    CMP DL, '0'
+    JE ING_CERO
+
+    CMP DL, '1'
+    JE ING_UNO
+
+    JMP ING_CICLO
+ING_UNO:
+    MOV AH, 6                   ;Imprime DL
+    INT 21H
+
+    SHL BX, 1                   ;ShiftLeft BX y agrega 1
+    ADD BX, 1
+
+    JMP SIGO1
+ING_CERO:
+    MOV AH, 6                   ;Imprime DL
+    INT 21H
+    MOV DL, AL                  ;Mueve valor AL a DL
+
+    SHL BX, 1                   ;ShiftLeft BL
+SIGO1:
+    LOOP ING_CICLO                 ;Loopea 16 veces
+POP DX
+POP AX
+
+POP BP
+RET
+ENDP

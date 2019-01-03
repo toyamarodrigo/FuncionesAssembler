@@ -1,0 +1,27 @@
+; REG - Funcion Imprime Bin 16bits
+
+IMPRIMIR_BIN PROC
+CICLO2:
+    SHL BX, 1                   ;ShiftLeft BL 1, si hay carry -> IMPUNO
+    JC IMPUNO
+
+IMPCERO:
+    MOV DL, "0"                 ;Mueve 0 a DL
+
+SIGO2:
+    MOV AH, 6                   ;Imprime DL
+    INT 21H
+                                ;CX = 0
+    ADD CX, 1                   ;CX + 1
+    
+    CMP CX, 16                  ;CX = 16?
+    JE FIN
+
+    JMP CICLO2
+
+IMPUNO:
+    MOV DL, "1"                 ;Mueve 1 a DL
+    JMP SIGO2
+FIN:                            ;Fin
+    RET
+ENDP

@@ -1,0 +1,174 @@
+.8086
+.model small
+.stack 100h
+.data
+	TEXTO db 40 DUP('$')
+	CADE db 6 DUP ('$')
+	CARTEL DB "Ingrese Texto:", 0dh, 0ah, '$'
+	CARTEL2 DB "Ingrese cadena:", 0dh, 0ah, '$'
+	CARTEL3 DB "No se encontro la cadena",0dh, 0ah,'$'
+	SALTO DB, 0DH, 0AH, '$'
+.code
+main proc
+	mov AX, @DATA
+	mov DS, AX
+	
+	mov AH, 9                       ;MUESTRA CARTEL EN PANTALLA
+	mov DX, OFFSET CARTEL
+	int 21h
+	
+	mov bx, offset texto
+	mov cl, 13
+	mov AX, 38	
+	CALL INGRESO
+	
+	mov AH, 9
+	mov DX, OFFSET CARTEL2
+	int 21h
+	
+	mov bx, offset cade
+	mov cl, 13
+	mov AX, 4
+	call INGRESO
+	
+	;mov DI,OFFSET TEXTO  preguntar
+	;MOV SI,offset CADE
+	
+	;mov AX,offset texto
+	;mov DX,offset cade
+	
+	call cmpcadena
+	
+	cmp bx,0FFFFh  ;pregunta si llegò al final
+	je noencontro
+	
+	call BINARIO16	
+	jmp terminar
+	
+	noencontro:	
+		mov AH, 9
+		mov DX, OFFSET CARTEL3
+		int 21h
+	
+	terminar:
+		MOV AX, 4C00H
+		INT 21h
+endp
+
+	
+
+;FUNCION INGRESO DE TEXTO. 
+;Recibe en AX cantidad maxima de caracter a ingresar, BX puntero de la viariable para el texto, CL caracter de corte
+;Devuelve en AX la cantidad de caracteres ingresados
+INGRESO PROC
+PUSH SI
+push DI
+push dx
+
+mov di, ax
+mov SI, 0
+
+ING:                                ;Solo admite letras de la "A" a la "Z" y espacios
+	mov AH, 8
+	int 21H
+	cmp AL, CL                      ;Caracter de corte
+	JE fin_ingre
+	cmp AL, 'A'
+	JL ESPA 
+	cmp AL, 'Z'
+	JLE GUARDAR
+	cmp AL, 'a'
+	JL ING
+	cmp AL, 'z'
+	JLE GUARDAR
+	JMP ING
+ESPA:
+	cmp AL, 32                      ; comparo si el caracter ingresado es un espacio
+	JE GUARDAR
+	JMP ING
+GUARDAR:
+	mov dl, al
+	mov ah, 6
+	int 21h
+	mov [SI + BX], AL
+	ADD SI, 1
+	cmp SI, di
+	JE fin_ingre
+	JMP ING
+
+fin_ingre:
+	mov Ax, SI
+
+pop dx	
+pop di
+POP si	
+RET	
+ENDP
+
+;----------------------------------------------------------------------------
+;Devuelve en bx la posicion donde encuentra la cadena
+;En AX recibe el texto 
+;En DX recibe la cadena
+
+cmpcadena proc 
+push ax
+PARTE3:
+	MOV BX, 0
+	MOV DI, 0
+CICLO3:
+	MOV AL, [BX + DI + OFFSET TEXTO]
+	CMP AL, [DI + OFFSET CADE]
+	JNE VUELVOAEMPEZAR
+	ADD DI, 1
+	MOV AL, '$'
+	CMP AL, [DI + OFFSET CADE]
+	JE ENCONTRE
+	CMP AL, [BX + DI + OFFSET TEXTO]
+	JE NOENCONTRE
+	JMP CICLO3
+VUELVOAEMPEZAR:
+	ADD BX, 1
+	XOR DI, DI
+	MOV AL, '$'
+	CMP AL, [BX + OFFSET TEXTO]
+	JE NOENCONTRE
+	JMP CICLO3
+ENCONTRE:
+	ADD BX, 1 
+	jmp fin
+NOENCONTRE:
+	MOV BX, 0FFFFh
+
+fin: 
+	pop ax
+	ret
+endp
+;--------------------------------------------------------------------
+BINARIO16 PROC
+PUSH AX
+PUSH DX
+
+MOV CX, 16
+CICLO:
+	SHL BX, 1
+	JC UNO
+	mov DL, '0'
+	mov AH, 6
+	int 21h
+	JMP SIGO
+UNO:
+	mov DL, '1'
+	mov AH, 6
+	int 21h
+SIGO:
+	SUB CX, 1
+	cmp CX, 0
+	JNE CICLO
+POP DX
+POP AX
+RET
+ENDP
+;--------------------------------------------------------------------------
+
+
+end main

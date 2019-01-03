@@ -1,0 +1,49 @@
+;REG - FUNCION RECORRER EL TEXTO PARA ENCONTRAR LA PRIMER LETRA DE CADA PALABRA Y 
+;PASARLA A MAYUSCULA (PALABRA EN Capital)
+
+BUSCAR PROC
+PUSH SI
+PUSH AX
+PUSH DI
+PUSH SI
+PUSH BX
+PUSH CX
+
+FIN_ING:
+	mov DI, 0; para recorrer el texto desde la posicion 0
+SIGO:
+	mov CX, 1; ayuda para verificar si donde estoy ubicada es la primer letra de una palabra
+BUSC:
+	cmp DI, SI
+	JE fin_busc
+	mov ah, 38; en ah comparo si es un &
+	cmp [DI + BX], ah
+	JE SIGO1
+	cmp CX, 1
+	JE LETR
+	ADD DI, 1
+	JMP BUSC
+SIGO1:
+	ADD DI, 1
+	JMP SIGO
+LETR:
+	mov AL, [DI + BX]
+	cmp AL, 'a'; verificar si la letra es minuscula
+	JGE CAPI
+	ADD DI, 1
+	JMP BUSC
+CAPI:
+	SUB AL, 32; la letra minuscula se pasa a mayuscula
+	mov [DI + BX], AL
+	mov CX, 0
+	ADD DI, 1
+	JMP BUSC
+fin_busc:
+POP CX
+POP BX
+POP SI	
+POP DI	
+POP AX
+POP SI	
+RET
+ENDP

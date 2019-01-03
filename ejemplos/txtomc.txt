@@ -1,0 +1,169 @@
+;Imprimir texto de hasta 50 caracteres o terminado con $ que imprima el texto original, 
+;en mayuscula y primera letra en mayuscula(CAPITAL)
+
+.8086
+.MODEL SMALL
+.STACK 100H
+.DATA
+
+	CARTEL1 DB 0DH, 0AH, "Ingrese texto: $"
+	CARTEL2 DB 0DH, 0AH, "Texto original: $"
+	CARTEL3 DB 0DH, 0AH, "Texto en Mayuscula: $"
+	CARTEL4 DB 0DH, 0AH, "Primera letra Capital: $"
+	TEXTO DB 50 DUP('$'),0DH, 0AH, "$"
+	TEXTO2 DB 50 DUP('$'),0DH, 0AH, "$"
+
+.CODE
+MAIN PROC
+	MOV AX, @DATA
+	MOV DS, AX
+	;i = 0
+	MOV BX, 0
+
+	;Imprime CARTEL1
+	MOV AH, 9
+	MOV DX, OFFSET CARTEL1
+	INT 21H
+
+CICLO:
+	;Ingreso en AL
+	MOV AH, 1
+	INT 21H
+	;Si AL = $ -> SIGO
+	CMP AL, '$'
+	JE SIGO
+
+	;Copiar letra AL en TEXTO[i]
+	MOV TEXTO[BX], AL
+	;i++
+	INC BX
+
+	;Si i = 50 -> SIGO, Sino CICLO
+	CMP BX, 50
+	JE SIGO
+	JMP CICLO
+SIGO:
+	;Imprime CARTEL2
+	MOV AH, 9
+	MOV DX, OFFSET CARTEL2
+	INT 21H
+
+	;Imprime TEXTO
+	MOV AH, 9
+	MOV DX, OFFSET TEXTO
+	INT 21H
+	
+	;i = 0
+	MOV BX, 0
+VUELTA:
+	;Letra en AL a TEXTO[i]
+	MOV AL, TEXTO[BX]
+	;Si AL = $ -> CAPI
+	CMP AL, '$'
+	JE CAPI
+
+	;Si AL < 'a' -> COPIOAL
+	CMP AL, 'a'
+	JL COPIOAL
+
+	;Si AL > 'z' -> COPIOAL
+	CMP AL, 'z'
+	JG COPIOAL
+
+	;Convierte a Mayuscula (AL - 20hex[32dec])
+	SUB AL, 20H
+
+COPIOAL:
+	;Letra en AL a TEXTO2[i]
+	MOV TEXTO2[BX], AL
+	
+	;i++
+	INC BX
+	JMP VUELTA
+CAPI:
+	;Imprime CARTEL3
+	MOV AH, 9
+	MOV DX, OFFSET CARTEL3
+	INT 21H
+
+	;Imprime TEXTO2
+	MOV DX, OFFSET TEXTO2
+	MOV AH, 9
+	INT 21H
+	;i = 0
+	MOV BX, 0
+OTRAV:
+	;Letra en TEXTO[i] a AL
+	MOV AL, TEXTO[BX]
+	;Si AL = '$' -> FIN
+	CMP AL, '$'
+	JE FIN
+
+	;Si AL < 'a' -> OTRO
+	CMP AL, 'a'
+	JL OTRO
+
+	;SI AL > 'z' -> OTRO
+	CMP AL, 'z'
+	JG OTRO
+
+	;Convierte a Mayuscula (AL - 20hex[32dec])
+	SUB AL, 20H 
+OTRO:
+	;Letra en AL a TEXTO2[i]
+	MOV TEXTO2[BX], AL
+	;i++
+	INC BX
+OTRO2:
+	;Letra en TEXTO[i] a AL
+	MOV AL, TEXTO[BX]
+
+	;Si AL = '$' -> FIN
+	CMP AL, '$'
+	JE FIN
+
+	;Si AL < 'A' -> DEJO 
+	CMP AL, 'A'
+	JL DEJO
+
+	;Si AL > 'Z' -> DEJO
+	CMP AL, 'Z'
+	JG DEJO
+
+	;Convierte en minuscula (AL + 20hex[32dec])
+	ADD AL, 20H
+DEJO:
+	;Letra en AL a TEXTO2[i]
+	MOV TEXTO2[BX], AL
+
+	;i++
+	INC BX
+	;Letra en TEXTO[i] a AL
+	MOV AL, TEXTO[BX]
+
+	;Si AL = 20H (32decimal) 
+	CMP AL, 20H
+	JE COPIO
+
+	JMP OTRO2
+COPIO:
+	;Letra en AL a TEXTO2[i]
+	MOV TEXTO2[BX], AL
+	;i++
+	INC BX
+	JMP OTRAV
+FIN:
+	;Imprime CARTEL4
+	MOV AH, 9
+	MOV DX, OFFSET CARTEL4
+	INT 21H
+	
+	;Imprime TEXTO2
+	MOV AH, 9
+	MOV DX, OFFSET TEXTO2
+	INT 21H
+	;FIN
+	MOV AX, 4C00H
+	INT 21H
+	ENDP
+END MAIN

@@ -1,0 +1,185 @@
+;Programa que permite el ingreso de un texto de hasta 255 caracteres o terminado en "$", 
+;imprima el texto original, la cantidad de Vocales en Binario y la longitud del texto en HEXADECIMAL
+
+.8086
+.MODEL SMALL
+.STACK 100H
+.DATA
+
+    VOWELS db "AaEeIiOoUu$"
+    TEXT db 255 dup('$')
+    BANNER1 db 0dh, 0ah, "Enter text(up to 255 char): $"
+    BANNER2 db 0dh, 0ah, "Texto original: $"
+    BANNER3 db 0dh, 0ah, "Cantidad Vocales en Binario: $"
+    BANNER4 db 0dh, 0ah, "Longitud del texto en Hex: $"
+
+
+.CODE
+MAIN PROC
+    MOV AX, @DATA
+    MOV DS, AX
+    ;i = 0
+    MOV BX, 0
+    ;Prints BANNER1
+    MOV AH, 9
+    MOV DX, OFFSET BANNER1
+    INT 21H
+CICLE1:
+    ;Input text
+    MOV AH, 1
+    INT 21H
+    
+    ;if AL = $ -> PROCESS
+    CMP AL, '$'
+    JE PROCESS1
+
+    ;Letter AL to TEXT[i]
+    MOV TEXT[BX], AL
+    ;i++
+    INC BX
+
+    ;if i = 255 -> PROCESS else CICLE
+    CMP BX, 255
+    JE PROCESS1
+    JMP CICLE1
+PROCESS1:
+    ;Saves i value to DI
+    MOV DI, BX
+    MOV DL, 0
+    MOV BX, 0
+BIGCICLE:
+    ;Letter TEXT[i] to AL
+    MOV AL, TEXT[BX]
+    ;k = 0
+    MOV SI, 0
+    ;loop = 10
+    MOV CX, 10
+    CMP AL, "$"
+    JE PROCESS2
+SEEVOWEL:
+    ;if AL = VOWELS[k] -> SUM
+    CMP AL, VOWELS[SI]
+    JE SUM
+    ;k++
+    INC SI
+    LOOP SEEVOWEL
+GOON1:
+    ;i++
+    INC BX
+    JMP BIGCICLE
+SUM:
+    ;j++
+    INC DL
+    JMP GOON1
+PROCESS2:
+    ;Value DI (ex i) to i 
+    MOV BX, DI
+    ;j to BH
+    MOV BH, DL
+
+    ;Prints BANNER2
+    MOV AH, 9
+    MOV DX, OFFSET BANNER2
+    INT 21H
+
+    ;Prints TEXT
+    MOV DX, OFFSET TEXT
+    MOV AH, 9
+    INT 21H
+    ;Loop 8
+    MOV CX, 8
+
+    ;Prints BANNER3
+    MOV AH, 9
+    MOV DX, OFFSET BANNER3
+    INT 21H
+
+CICLE2:
+    ;Shift left BH
+    SHL BH, 1
+    JC ONE
+    MOV DL, '0'
+GOON2:
+    ;Prints DL
+    MOV AH, 6
+    INT 21H
+    JMP GOON3
+ONE:
+    MOV DL, '1'
+    JMP GOON2
+GOON3:
+    ;LOOPS CICLE2 8times (CX=8)
+    LOOP CICLE2
+    ;Sets Loop = 4
+    MOV CX, 4
+    ;Shift Left BX 4times
+    SHL BX, CL
+
+    MOV CX, 4
+    ;Shift Right BL 4times
+    SHR BL, CL
+
+    ;EX.
+            ;BH         BL
+        ;0000|0000   0100|0001 = BX
+
+    ;MOV CX, 4
+    ;SHL BX, CL (shift left 4 times)
+
+        ;0000|0100  0001|0000 = BX
+    
+    ;MOV CX, 4
+    ;SHR BL, CL (shift right 4 times)
+
+        ;0000|0100  0000|0001 = BX
+
+
+    ;Prints BANNER4
+    MOV AH, 9
+    MOV DX, OFFSET BANNER4
+    INT 21H
+    
+    ;if BH <= 9 -> NUM1
+    CMP BH, 9
+    JLE NUM1
+
+    ;Adds 55 to BH
+    ADD BH, 55
+
+OTHER1:
+    ;Saves BH to DL
+    MOV DL, BH
+
+    ;Prints DL
+    MOV AH, 6
+    INT 21H
+    JMP NUM2
+NUM1:
+    ;Adds 0(00000000) to BH 
+    ADD BH, '0'
+    JMP OTHER1
+NUM2:
+    ;if BL <= 9 -> NUM3
+    CMP BL, 9
+    JLE NUM3
+    ;Adds 55 to BL
+    ADD BL, 55
+OTHER2:
+    ;Moves BL to DL
+    MOV DL, BL
+
+
+    ;Prints DL
+    MOV AH, 6
+    INT 21H
+    JMP FIN
+NUM3:
+    ;Adds 0 to BL
+    ADD BL, "0"
+    JMP OTHER2
+FIN:
+    MOV AX, 4C00H
+    INT 21H
+    
+    ENDP
+END MAIN

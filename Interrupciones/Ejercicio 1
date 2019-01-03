@@ -1,0 +1,130 @@
+;Escribir una funcion que cuenta la cantidad de caracteres a partir de una direccion dada hasta encontrar otro caracter dado y duvuelve en AX la cantidad de caracteres.
+;(a)Realizar la funcion usando pasaje de parametros por registro.
+;(b)Realizar la funcion por parametros por stack.
+;(c)Realizar un programa que invoque a la funcion
+
+.8086
+.model small
+.stack  100H
+.data
+	Texto db 10 dup('$'), 0DH, 0AH, '$'
+	Cartel1 DB "Ingresar un texto de hasta 10 caracteres:", 0AH, 0DH, '$'
+	Cartel2 DB 0AH, 0DH, "Ingresar la letra a buscar:", 0AH, 0DH, '$'
+	Cartel3 DB 0AH, 0DH, "Cantidad de caracteres:", 0AH, 0DH, '$'
+.code
+main proc
+	mov AX, @data
+	mov DS, AX
+	
+	mov DX, offset Cartel1 ;Imprimo Cartel1
+	mov AH, 9
+	int 21h
+	
+	mov BX, 0
+	
+IngresarTexto:
+	mov AH, 1
+	int 21H
+	mov[BX + offset Texto], AL
+	inc BX
+	cmp BX, 10
+	jl IngresarTexto
+
+IngresarCaracter:
+	mov DX, offset Cartel2 ;Imprimo Cartel2
+	mov AH, 9
+	int 21h
+	
+	mov AH, 1
+	int 21H
+
+PreprarDatos:
+	mov DX, offset Texto
+	push AX
+	push DX
+	call ContarCharStack
+	;call ContarCharReg
+	Add sp, 4
+
+ImprimirCantidad:
+	mov CL, AL ;Salvo el valor de AX enviado por la funcion ContarCharStack en CL
+	mov DX, offset Cartel3 ;Imprimo Cartel3
+	mov AH, 9
+	int 21h
+	
+	add cl, 48
+	mov AH, 6
+	mov DL, CL ;Imprimo la cantidad de caracteres
+	int 21H
+	
+Fin:
+	mov AX, 4C00H
+	INT 21H
+ENDP
+
+
+ContarCharStack proc
+	;(C) Salvo el BP y guardo el SP en el BP
+	push bp
+	mov bp, sp
+	
+	;(F) Salvo los registros que voy a usar
+	push BX
+	push CX
+	push DX
+	push DI
+	
+	;(E) Desarrollo la accion e la funcion
+	mov BX, [BP + 4] ; guardo en BX la direccion del texto
+	mov AX, [BP + 6] ; guardo en AX la letra que quiero comparar
+	mov DI, 0 ;Uso DI como contador
+	
+buscarChar:
+	cmp DI, 10 ;Ciclo para evitar que siga buscando si la letra a buscar no se encuentra en el texto
+	je terminar
+	mov DL, [DI + BX]
+	cmp DL, AL
+	je terminar
+	inc DI
+	jmp buscarChar
+	
+terminar:
+	mov AX, DI ;Paso el parametro a AX
+	;(G) Retorno los registros salvados
+	pop DI
+	pop DX
+	pop CX
+	pop BX
+	
+	;(D) Retorno BP
+	pop BP
+	ret
+endp
+
+ContarCharReg proc
+	;(F) Salvo los registros que voy a usar
+	push BX
+	push CX
+	push DI
+	;(E)
+	mov BX, 0 ; Contador
+	mov DI, DX
+ciclo:
+	mov CL,[BX + DI]
+	cmp CL, AL; AX tiene la letra que quiero comparar
+	je sigo
+	inc BX
+	jmp ciclo
+sigo:
+	mov ax, BX
+	;(G)
+	pop DI
+	pop CX
+	pop BX
+ret
+endP
+
+END MAIN
+	
+
+

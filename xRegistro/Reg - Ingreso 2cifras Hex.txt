@@ -1,0 +1,68 @@
+;REG - Funcion Ingreso 2 cifras HEX
+
+INGRESO PROC
+PUSH AX
+PUSH DX
+	CICLO:                          ;Validar Hexadecimal
+		MOV AH, 8
+		INT 21H
+		CMP AL, '0'
+		JL CICLO
+		CMP AL, 'F'
+		JG CICLO
+		CMP AL, 'A'
+		JGE LETRA
+		CMP AL, '9'
+		JLE NUMERO
+		JMP CICLO
+	NUMERO:
+		MOV AH, 6                   ;Lo mueve a DL e imprime caracter Hex
+		MOV DL, AL
+		INT 21H
+		SUB DL, 48
+		JMP SIGO
+	LETRA:
+		MOV AH, 6
+		MOV DL, AL
+		INT 21H
+		SUB DL, 55
+		JMP SIGO
+	SIGO:
+		MOV BL, DL
+		SHL BL, 1
+		SHL BL, 1
+		SHL BL, 1
+		SHL BL, 1
+	CICLO2:
+		MOV AH, 8
+		INT 21H
+		CMP AL, '0'
+		JL CICLO2
+		CMP AL, 'F'
+		JG CICLO2
+		CMP AL, 'A'
+		JGE LETRA2
+		CMP AL, '9'
+		JLE NUMERO2
+		JMP CICLO2
+	NUMERO2:
+		MOV AH, 6
+		MOV DL, AL
+		INT 21H
+		SUB DL, 48
+		ADD BL, DL
+		JMP SIGO2
+	LETRA2:
+		MOV AH, 6
+		MOV DL, AL
+		INT 21H
+		SUB DL, 55
+		ADD BL, DL
+	SIGO2:
+		MOV DX, CX
+		MOV AH, 9
+		INT 21H
+POP DX
+POP AX
+RET
+ENDP

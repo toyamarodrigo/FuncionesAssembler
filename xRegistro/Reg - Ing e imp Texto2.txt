@@ -1,0 +1,105 @@
+;REG - Funcion ingreso texto
+;AX cantidad maxima de caracteres a ingresar
+;BX puntero a variable de texto
+;CL caracter de corte
+;Devuelve en AX la cantidad de caracteres ingresados
+
+;Luego imprime la cantidad de caracteres en Binario de 16bits
+
+.8086
+.MODEL SMALL
+.STACK 100H 
+.DATA
+	
+    TEXTO1 DB 250 DUP('$')
+
+.CODE
+MAIN PROC
+	MOV AX, @DATA
+	MOV DS, AX
+
+    MOV AX, 35
+    MOV BX, OFFSET TEXTO1
+    MOV CL, "$"
+
+    CALL INGRESO
+
+    MOV BX, AX                      ;MUEVO AX(Cantidad de caracteres) a BX, para Imprimir Binario 16bits
+    
+    CALL BINARIO16
+
+    MOV AX, 4C00H
+    INT 21H
+
+ENDP
+
+INGRESO PROC
+PUSH SI
+PUSH DI
+PUSH DX
+
+MOV DI, AX
+MOV SI, 0
+
+INGRESOTXT:                             ;Solo admite letras de la "A" a la "Z" y espacios
+	MOV AH, 8
+	INT 21H
+	CMP AL, CL                          ;Caracter de corte
+	JE FIN
+	CMP AL, 'A'
+	JL ESPACIO 
+	CMP AL, 'Z'
+	JLE GUARDAR
+	CMP AL, 'a'
+	JL INGRESOTXT
+	CMP AL, 'z'
+	JLE GUARDAR
+	JMP INGRESOTXT
+ESPACIO:
+	CMP AL, 32                          ;Comparo si caracter es un espacio
+	JE GUARDAR
+	JMP INGRESOTXT
+GUARDAR:
+	MOV DL, AL
+	MOV AH, 6
+	INT 21H
+	MOV [SI + BX], AL                   ;TEXTO1[SI], AL
+	ADD SI, 1                           ;SI++
+	CMP SI, DI                          ;DI = Cantidad max. de caracteres
+	JE FIN
+	JMP INGRESOTXT
+
+FIN:
+	MOV AX, SI
+POP DX	
+POP DI
+POP SI	
+RET	    
+ENDP
+
+BINARIO16 PROC
+PUSH AX
+PUSH DX
+
+MOV CX, 16
+CICLO:
+	SHL BX, 1
+	JC UNO
+	mov DL, '0'
+	mov AH, 6
+	int 21h
+	JMP SIGO
+UNO:
+	mov DL, '1'
+	mov AH, 6
+	int 21h
+SIGO:
+	SUB CX, 1
+	cmp CX, 0
+	JNE CICLO
+POP DX
+POP AX
+RET
+ENDP
+
+END MAIN

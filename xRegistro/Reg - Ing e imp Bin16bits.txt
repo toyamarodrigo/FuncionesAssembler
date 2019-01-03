@@ -1,0 +1,100 @@
+; REG - Funcion Ing e Imp Bin 16bits
+
+.8086
+.MODEL SMALL
+.STACK 100H
+.DATA
+	
+	CARTEL DB 0DH, 0AH, "Ingrese Nro Binario 16bits: $"
+    CARTEL2 DB 0DH, 0AH, "Impresion de Binario: $"
+
+.CODE
+MAIN PROC
+	MOV AX, @DATA
+	MOV DS, AX
+
+    MOV AX, OFFSET CARTEL
+    CALL IMPRIMIRCARTEL         ;Llama funcion IMPRIMIRCARTEL
+    CALL INGRESOBIN16           ;Llama funcion INGRESOBIN16
+    MOV DI, AX
+
+    MOV AX, OFFSET CARTEL2
+    CALL IMPRIMIRCARTEL         ;Llama funcion IMPRIMIRCARTEL
+    CALL IMPRIMIR_BIN           ;Llama funcion IMPRIMIR_BIN
+    MOV AX, 4C00H               ;Fin
+    INT 21H
+ENDP
+ 
+IMPRIMIRCARTEL PROC
+    PUSH AX
+    PUSH DX
+    
+    MOV DX, AX
+    MOV AH, 9
+    INT 21H
+
+    POP DX
+    POP AX
+    RET
+ENDP
+
+INGRESOBIN16 PROC
+    MOV CX, 16                  ;Ciclo de 16
+    MOV BX, 0                   ;BX = 0
+CICLO1:
+    MOV AH, 8                   ;Ingreso de 0 ó 1 en AL
+    INT 21H
+    MOV DL, AL                  ;Muevo valor AL a DL
+
+    CMP DL, '0'
+    JE CERO
+
+    CMP DL, '1'
+    JE UNO
+
+    JMP CICLO1
+UNO:
+    MOV AH, 6                   ;Imprime DL
+    INT 21H
+
+    SHL BX, 1                   ;ShiftLeft BX y agrega 1
+    ADD BX, 1
+
+    JMP SIGO1
+CERO:
+    MOV AH, 6                   ;Imprime DL
+    INT 21H
+    MOV DL, AL                  ;Mueve valor AL a DL
+
+    SHL BX, 1                   ;ShiftLeft BL
+SIGO1:
+    LOOP CICLO1                 ;Loopea 16 veces
+    RET
+ENDP
+
+IMPRIMIR_BIN PROC
+CICLO2:
+    SHL BX, 1                   ;ShiftLeft BL 1, si hay carry -> IMPUNO
+    JC IMPUNO
+
+IMPCERO:
+    MOV DL, "0"                 ;Mueve 0 a DL
+
+SIGO2:
+    MOV AH, 6                   ;Imprime DL
+    INT 21H
+                                ;CX = 0
+    ADD CX, 1                   ;CX + 1
+    
+    CMP CX, 16                  ;CX = 16?
+    JE FIN
+
+    JMP CICLO2
+
+IMPUNO:
+    MOV DL, "1"                 ;Mueve 1 a DL
+    JMP SIGO2
+FIN:                            ;Fin
+    RET
+ENDP
+END MAIN

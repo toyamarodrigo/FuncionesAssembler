@@ -1,0 +1,48 @@
+.8086
+.model small
+.stack 100h
+.data
+CARTEL DB "Ingrese decimal de una cifra: ", 0DH, 0AH, '$'
+SALTO DB 0DH, 0AH, '$'
+.code
+main proc
+	mov AX, @data
+	mov DS, AX
+	mov AH, 9
+	mov DX, OFFSET CARTEL
+	int 21h
+	mov BL, 0
+	mov CX, 8
+UNO:
+	mov AH, 8
+	int 21h
+	cmp AL, '0'
+	JL UNO
+	cmp AL, '9'
+	JG UNO
+	mov AH, 6
+	mov DL, AL
+	int 21h
+	mov BL, DL
+	SUB BL, 48
+	mov DX, OFFSET SALTO
+	mov AH, 9
+	int 21H
+CICLO:
+	SHL BL, 1
+	JC IMPUNO
+IMPCERO:
+	mov AH, 6
+	mov DL, '0'
+	int 21h
+	JMP SIGO
+IMPUNO:
+	mov AH, 6
+	mov DL, '1'
+	int 21h
+SIGO:
+	LOOP CICLO
+	mov AX, 4c00h
+	int 21h
+endp
+end main

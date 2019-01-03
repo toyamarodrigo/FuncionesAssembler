@@ -1,0 +1,53 @@
+;ESTE ES EL PROGRAMA QUE LLAMA A LA INTERRUPCION
+
+.8086
+.model small
+.data
+
+.code
+main proc
+	mov ax,@data
+	mov ds,ax
+	
+	mov ax,5 ;parametro de las funciones
+	mov bx,17 ;parametro de las funciones
+	mov dl,0
+	
+	int 80h
+	
+	call BINARIO16
+	
+	mov ax, 4c00h
+    int 21h
+endp
+
+;-------------------------------------------------------------------
+BINARIO16 PROC
+PUSH AX
+PUSH DX
+
+MOV CX, 16
+CICLO:
+	SHL BX, 1
+	JC UNO
+	mov DL, '0'
+	mov AH, 6
+	int 21h
+	JMP SIGO
+UNO:
+	mov DL, '1'
+	mov AH, 6
+	int 21h
+SIGO:
+	SUB CX, 1
+	cmp CX, 0
+	JNE CICLO
+POP DX
+POP AX
+RET
+ENDP
+
+end main
+
+
+

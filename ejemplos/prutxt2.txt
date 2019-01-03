@@ -1,0 +1,67 @@
+;Funcion ingreso texto de hasta 50 caracteres
+;Retorna en SI la cantidad de caracteres ingresados (espacios tambien)
+;(devuelve el ascii)
+
+.8086
+.MODEL SMALL
+.STACK 100H
+.DATA
+
+	TEXTO1 DB 50 DUP ("$")
+
+.CODE
+MAIN PROC
+	MOV AX, @DATA
+	MOV DS, AX
+
+	MOV BX, OFFSET TEXTO1
+	CALL INGRESO
+
+    MOV AH, 9
+    INT 21H
+
+    MOV AX, 4C00H
+    INT 21H
+
+ENDP
+
+INGRESO PROC
+PUSH AX
+PUSH BX
+
+INGRESOTXT:                            ;Verifico caracteres if letras o espacio 
+	MOV AH, 1
+	int 21H
+	CMP AL, 13
+	JE FIN
+	CMP AL, 'A'
+	JL ESPACIO 
+	CMP AL, 'z'
+	JG INGRESOTXT
+	CMP AL, 'Z'
+	JLE GUARDAR
+	CMP AL, 'a'
+	JGE GUARDAR
+	JMP INGRESOTXT
+ESPACIO:
+	CMP AL, 32                      ;Comparo es un espacio
+	JE AMP
+	JMP INGRESOTXT
+GUARDAR:
+	MOV [SI + BX], AL
+	ADD SI, 1
+	CMP SI, 50
+	JE FIN
+	JMP INGRESOTXT
+AMP:
+	MOV AL, 38                      ;Cambio espacio x un &
+	JMP GUARDAR
+FIN:
+    MOV DX, SI
+POP BX
+POP AX	
+RET	
+
+ENDP
+
+END MAIN

@@ -1,0 +1,160 @@
+;Funcion Ingreso por Registro e Impresion de Hex por Stack
+;CX hex
+
+.8086
+.MODEL SMALL
+.STACK 100H
+.DATA
+	
+	CARTEL DB 0DH, 0AH, "Ingrese Nro Hex: $"
+    CARTEL2 DB 0DH, 0AH, "Impresion de Hex: $"
+
+.CODE
+MAIN PROC
+	MOV AX, @DATA
+	MOV DS, AX
+
+    MOV AX, OFFSET CARTEL
+    CALL ImprimirCartel         ;Llama a Imprimir Cartel
+    CALL IngresoHex             ;Llama a IngresoHex
+    
+    MOV AX, OFFSET CARTEL2
+    CALL ImprimirCartel
+    PUSH CX
+    CALL IMPHEXASTACK
+    ADD SP, 2
+
+    MOV AX, 4C00H               ;Fin
+    INT 21H    
+ENDP
+
+ImprimirCartel PROC
+    PUSH AX
+    PUSH DX
+    
+    MOV DX, AX
+    MOV AH, 9
+    INT 21H
+
+    POP DX
+    POP AX
+    RET
+ENDP
+
+IngresoHex PROC
+PUSH AX
+PUSH DX
+	ING_CICLO:                          ;Validar Hexadecimal
+		MOV AH, 8
+		INT 21H
+		CMP AL, '0'
+		JL ING_CICLO
+		CMP AL, 'F'
+		JG ING_CICLO
+		CMP AL, 'A'
+		JGE ING_LETRA
+		CMP AL, '9'
+		JLE ING_NUMERO
+		JMP ING_CICLO
+	ING_NUMERO:
+		MOV AH, 6                   ;Lo mueve a DL e imprime caracter Hex
+		MOV DL, AL
+		INT 21H
+		SUB DL, 48
+		JMP SIGO
+	ING_LETRA:
+		MOV AH, 6
+		MOV DL, AL
+		INT 21H
+		SUB DL, 55
+		JMP SIGO
+	SIGO:
+		MOV BL, DL
+		SHL BL, 1
+		SHL BL, 1
+		SHL BL, 1
+		SHL BL, 1
+	ING_CICLO2:
+		MOV AH, 8
+		INT 21H
+		CMP AL, '0'
+		JL ING_CICLO2
+		CMP AL, 'F'
+		JG ING_CICLO2
+		CMP AL, 'A'
+		JGE ING_LETRA2
+		CMP AL, '9'
+		JLE ING_NUMERO2
+		JMP ING_CICLO2
+	ING_NUMERO2:
+		MOV AH, 6
+		MOV DL, AL
+		INT 21H
+		SUB DL, 48
+		ADD BL, DL
+		JMP SIGO2
+	ING_LETRA2:
+		MOV AH, 6
+		MOV DL, AL
+		INT 21H
+		SUB DL, 55
+		ADD BL, DL
+    SIGO2:
+        MOV CL, BL
+        POP DX
+        POP AX
+RET
+ENDP
+
+IMPHEXASTACK PROC
+PUSH BP                                 ;Salvo el BP y guardo el SP en el BP
+MOV BP, SP
+PUSH CX                                 ;Salvo registros a usar
+PUSH AX
+PUSH BX
+PUSH DX
+
+MOV CL, [BP+4]                          ;Guardo en CL el Hex
+
+CIFRA1:	
+	MOV BL, CL
+	SHR BL, 4
+	CMP BL, 9
+	JLE IMPNUM1
+IMPLETRA1:
+	ADD BL, 55
+	MOV DL, BL
+	MOV AH, 6
+	INT 21H
+	JMP CIFRA2
+IMPNUM1:
+	ADD BL, 48
+	MOV DL, BL
+	MOV AH, 6
+	INT 21H	
+CIFRA2:
+	AND CL, 0FH
+	CMP CL, 9
+	JLE IMPNUM2
+IMPLETRA2:
+	ADD CL, 55
+	MOV DL, CL
+	MOV AH, 6
+	INT 21H
+	JMP FIN
+IMPNUM2:
+	ADD CL, 48
+	MOV DL, CL
+	MOV AH, 6
+	INT 21H
+FIN:
+    POP DX
+    POP BX
+    POP AX
+    POP CX
+
+    POP BP
+RET
+ENDP
+
+END MAINs

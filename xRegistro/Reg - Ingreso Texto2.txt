@@ -1,0 +1,52 @@
+;REG - FUNCION INGRESO DE TEXTO. 
+;Recibe en AX cantidad maxima de caracter a ingresar
+;BX puntero de la viariable para el texto
+;CL caracter de corte
+;Devuelve en AX la cantidad de caracteres ingresados
+
+INGRESO PROC
+PUSH SI
+PUSH DI
+PUSH DX
+
+MOV DI, AX
+MOV SI, 0
+
+INGRESOTX:                              ;Solo admite letras de la "A" a la "Z" y espacios
+	MOV AH, 8
+	INT 21H
+	CMP AL, CL                          ;Caracter de corte
+	JE FIN
+	CMP AL, 'A'
+	JL ESPACIO 
+	CMP AL, 'Z'
+	JLE GUARDAR
+	CMP AL, 'a'
+	JL INGRESOTXT
+	CMP AL, 'z'
+	JLE GUARDAR
+	JMP INGRESOTXT
+ESPACIO:
+	CMP AL, 32                          ;Comparo si caracter es un espacio
+	JE GUARDAR
+	JMP INGRESOTXT
+GUARDAR:
+	MOV DL, AL
+	MOV AH, 6
+	INT 21H
+	MOV [SI + BX], AL
+	ADD SI, 1
+	CMP SI, DI
+	JE FIN
+	JMP INGRESOTXT
+
+FIN:
+	MOV AX, SI
+
+POP DX	
+POP DI
+POP SI	
+RET	
+ENDP
+	
+END MAIN
