@@ -1,5 +1,5 @@
-;Funcion Imprimir Binario a Hex
-;en AL viene el numero binario a imprimir en hexa
+; xRegistro - Funcion Imprimir Binario a Hex
+; en AL viene el numero binario a imprimir en hexa
 
 IMPRIMIR_HEX PROC
 PUSH AX

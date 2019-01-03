@@ -1,4 +1,4 @@
-;REG - Funcion ingreso texto de hasta 50 caracteres
+;xRegistro - Funcion ingreso texto de hasta 50 caracteres
 ;Retorna en SI la cantidad de caracteres ingresados (espacios tambien)
 ;(devuelve el ascii)
 

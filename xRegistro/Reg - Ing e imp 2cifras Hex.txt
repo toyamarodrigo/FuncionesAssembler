@@ -1,4 +1,4 @@
-;REG - Funcion Ing e impresion Hex 2 cifras
+; xRegistro - Funcion Ing e impresion Hex 2 cifras
 
 .8086
 .MODEL SMALL

@@ -1,4 +1,4 @@
-; STACK - Funcion Ingreso Bin 16bits
+; xStack - Funcion Ingreso Bin 16bits
 
 ...
 MOV CX, 16

@@ -1,4 +1,4 @@
-; REG - Funcion Ing e Imp Bin 8 bits
+; xRegistro - Funcion Ing e Imp Bin 8 bits
 
 .8086
 .MODEL SMALL

@@ -1,4 +1,4 @@
-; REG - Funcion Ingreso Bin 16bits
+; xRegistro - Funcion Ingreso Bin 16bits
 
 IngresoBinario16 PROC
 PUSH AX

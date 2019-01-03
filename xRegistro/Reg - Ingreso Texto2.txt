@@ -1,8 +1,8 @@
-;REG - FUNCION INGRESO DE TEXTO. 
-;Recibe en AX cantidad maxima de caracter a ingresar
-;BX puntero de la viariable para el texto
-;CL caracter de corte
-;Devuelve en AX la cantidad de caracteres ingresados
+; xRegistro - FUNCION INGRESO DE TEXTO. 
+; Recibe en AX cantidad maxima de caracter a ingresar
+; BX puntero de la viariable para el texto
+; CL caracter de corte
+; Devuelve en AX la cantidad de caracteres ingresados
 
 INGRESO PROC
 PUSH SI

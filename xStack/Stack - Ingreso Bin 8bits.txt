@@ -1,4 +1,4 @@
-; STACK - Funcion Ingreso Bin 8bits
+; xStack - Funcion Ingreso Bin 8bits
 
 ...
 MOV BX, 0

@@ -1,4 +1,4 @@
-; REG - Funcion Imprime Bin 16bits
+; xRegistro - Funcion Imprime Bin 16bits
 
 IMPRIMIR_BIN PROC
 CICLO2:

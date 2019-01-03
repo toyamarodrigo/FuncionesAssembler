@@ -1,4 +1,4 @@
-;REG - Funcion Ingreso 2 cifras HEX
+; xRegistro - Funcion Ingreso 2 cifras HEX
 
 INGRESO PROC
 PUSH AX

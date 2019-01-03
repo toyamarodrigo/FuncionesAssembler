@@ -1,4 +1,4 @@
-;REG - EN SI VIENE LA CANTIDAD DE CARACTERES	
+; xRegistro - en SI viene la cantidad de caracteres
 
 CAPICUA PROC 
 

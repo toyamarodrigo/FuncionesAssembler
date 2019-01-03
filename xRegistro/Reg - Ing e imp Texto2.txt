@@ -1,8 +1,8 @@
-;REG - Funcion ingreso texto
-;AX cantidad maxima de caracteres a ingresar
-;BX puntero a variable de texto
-;CL caracter de corte
-;Devuelve en AX la cantidad de caracteres ingresados
+; xRegistro - Funcion ingreso texto
+; AX cantidad maxima de caracteres a ingresar
+; BX puntero a variable de texto
+; CL caracter de corte
+; Devuelve en AX la cantidad de caracteres ingresados
 
 ;Luego imprime la cantidad de caracteres en Binario de 16bits
 

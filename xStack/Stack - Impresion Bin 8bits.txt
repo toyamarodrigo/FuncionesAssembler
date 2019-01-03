@@ -1,4 +1,4 @@
-;FUNCIONES DE INGRESO POR REGISTRO E IMPRESION DE BINARIO DE 8 BITS POR STACK
+; Funcion de Ingreso xRegistro e Impresion de Binario 8bits xStack
 
 .8086
 .MODEL SMALL

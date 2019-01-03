@@ -1,5 +1,5 @@
-;REG - FUNCION INGRESO DE TEXTO de hasta 50 Caracteres. 
-;Retorna en SI la cantidad de caracteres ingresados. (espacios tambien)
+; xRegistro - FUNCION INGRESO DE TEXTO de hasta 50 Caracteres. 
+; Retorna en SI la cantidad de caracteres ingresados. (espacios tambien)
 
 INGRESO PROC
 PUSH AX

@@ -1,4 +1,4 @@
-;REG - Funcion Impresion HEX 
+; xRegistro - Funcion Impresion HEX 
 ;Recibe en CL el HEX a imprimir
 
 IMPRIMIRHEX PROC

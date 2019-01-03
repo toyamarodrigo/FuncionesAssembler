@@ -1,4 +1,4 @@
-;REG - BX Puntero a variable de TEXTO
+;xRegistro - BX Puntero a variable de TEXTO
 
 IMP PROC
 PUSH AX
